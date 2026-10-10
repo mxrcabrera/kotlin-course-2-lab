@@ -16,61 +16,78 @@ enum class MenuOption {
     UNKNOWN
 }
 
+fun printBanner(
+    title: String = "AI Chat CLI",
+    width: Int = 31,
+    borderChar: Char = '='
+) {
+    val border = borderChar.toString().repeat(width)
+    println(border)
+    println("🤖 $title")
+    println(border)
+}
+
+fun askForUsername(): String {
+    print("Please, enter your name: ")
+    val input: String? = readlnOrNull()
+    return if (!input.isNullOrBlank()) input else "Guest"
+}
+
+fun parseMenuOption(rawOption: String?): MenuOption = when (rawOption) {
+    "1" -> MenuOption.CHAT
+    "2" -> MenuOption.SETTINGS
+    "3" -> MenuOption.EXIT
+    else -> MenuOption.UNKNOWN
+}
+
+fun printMenu() {
+    println("\n--- Main Menu ---")
+    println("1. Chat")
+    println("2. Settings")
+    println("3. Exit")
+    print("Choose an option: ")
+}
+
+fun executeMenuOption(option: MenuOption, username: String): Boolean {
+    return when (option) {
+        MenuOption.CHAT -> {
+            println(">>> Entering chat mode... (Work in progress)")
+            true
+        }
+        MenuOption.SETTINGS -> {
+            println(">>> Entering settings... (Work in progress)")
+            true
+        }
+        MenuOption.EXIT -> {
+            println("Goodbye, $username! See you soon.")
+            false
+        }
+        MenuOption.UNKNOWN -> {
+            println("Invalid option. Please try again.")
+            true
+        }
+    }
+}
+
 /**
  * Main interactive entry point for the AI Chat CLI application.
  */
 fun main() {
-    println("===============================")
-    println("🤖 AI Chat CLI")
-    println("===============================")
+    printBanner()
 
-    print("Please, enter your name: ")
-    
-    // Safely capture user terminal input
-    val input: String? = readlnOrNull()
-
-    // Validate input: if non-null and not blank use it; otherwise fallback to "Guest".
-    // Pedagogical note: In Lesson 4 we will modularize and clean up this logic with dedicated functions.
-    val username: String = if (!input.isNullOrBlank()) input else "Guest"
-
+    val username = askForUsername()
     println("\nHello, $username!")
 
-    // Main interactive loop that keeps the application alive
     while (true) {
-        println("\n--- Main Menu ---")
-        println("1. Chat")
-        println("2. Settings")
-        println("3. Exit")
-        print("Choose an option: ")
+        printMenu()
 
-        val rawOption: String? = readlnOrNull()
+        val rawInput = readlnOrNull()
+        val option = parseMenuOption(rawInput)
 
-        // Use 'when' as a first-class expression to parse raw text (String)
-        // into our structured Enum, returning the value directly.
-        val selectedOption: MenuOption = when (rawOption) {
-            "1" -> MenuOption.CHAT
-            "2" -> MenuOption.SETTINGS
-            "3" -> MenuOption.EXIT
-            else -> MenuOption.UNKNOWN
-        }
+        val shouldContinue = executeMenuOption(option, username)
 
-        // Use 'when' with our Enum. Because it is a closed hierarchy
-        // (the compiler knows all possible cases), it enforces exhaustive
-        // branch handling without requiring a default 'else'.
-        when (selectedOption) {
-            MenuOption.CHAT -> {
-                println(">>> Entering chat mode... (Work in progress)")
-            }
-            MenuOption.SETTINGS -> {
-                println(">>> Entering settings... (Work in progress)")
-            }
-            MenuOption.EXIT -> {
-                println("Goodbye, $username! See you soon.")
-                break // Break out of the while(true) loop and terminate cleanly
-            }
-            MenuOption.UNKNOWN -> {
-                println("Invalid option. Please try again.")
-            }
+        if (!shouldContinue) {
+            break
         }
     }
 }
